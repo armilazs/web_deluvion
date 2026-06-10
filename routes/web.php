@@ -26,6 +26,10 @@ Route::get('/devices', function () {
     return view('pages.devices');
 })->name('devices');
 
+Route::get('/qos', function () {
+    return view('pages.qos');
+})->name('qos');
+
 Route::get('/logs', function () {
     return view('pages.logs');
 })->name('logs');
@@ -37,3 +41,28 @@ Route::get('/settings', function () {
 })->name('settings');
 
 Route::post('/settings/add-admin', [SettingsController::class, 'addAdmin'])->name('settings.add_admin');
+
+Route::post('/clear-sensor-logs', function () {
+    try {
+        $firestore = app('firebase.firestore')->database();
+        $logsRef = $firestore->collection('monitoring/depok/log_data');
+        $documents = $logsRef->documents();
+        
+        $batch = $firestore->batch();
+        $count = 0;
+        foreach ($documents as $document) {
+            if ($document->exists()) {
+                $batch->delete($document->reference());
+                $count++;
+            }
+        }
+        
+        if ($count > 0) {
+            $batch->commit();
+        }
+        
+        return response()->json(['success' => true, 'deleted' => $count]);
+    } catch (\Exception $e) {
+        return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
+    }
+})->name('logs.clear');

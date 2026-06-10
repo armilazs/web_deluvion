@@ -1,0 +1,87 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isNumber(v) {
+      return v is int || v is float;
+    }
+
+    function validPenempatan(v) {
+      return v == "hulu" || v == "hilir";
+    }
+
+    function validSitus(v) {
+      return v == "pnj";
+    }
+
+    function validLogData() {
+      return request.resource.data.keys().hasOnly([
+          "anemometer",
+          "espcam_img_url",
+          "node_status",
+          "ombrometer",
+          "penempatan",
+          "sirine_status",
+          "situs",
+          "time",
+          "water_level",
+          "water_flow"
+        ])
+        && request.resource.data.keys().hasAll([
+          "anemometer",
+          "node_status",
+          "ombrometer",
+          "penempatan",
+          "sirine_status",
+          "situs",
+          "time",
+          "water_level",
+          "water_flow"
+        ])
+
+        && isNumber(request.resource.data.anemometer)
+        && request.resource.data.anemometer >= 0
+        && request.resource.data.anemometer <= 100
+
+        && isNumber(request.resource.data.ombrometer)
+        && request.resource.data.ombrometer >= 0
+        && request.resource.data.ombrometer <= 1000
+
+        && isNumber(request.resource.data.water_level)
+        && request.resource.data.water_level >= 0
+        && request.resource.data.water_level <= 1000
+
+        && isNumber(request.resource.data.water_flow)
+        && request.resource.data.water_flow >= 0
+        && request.resource.data.water_flow <= 1000
+
+        && request.resource.data.node_status is bool
+        && request.resource.data.sirine_status is bool
+
+        && request.resource.data.time is timestamp
+
+        && validPenempatan(request.resource.data.penempatan)
+        && validSitus(request.resource.data.situs)
+
+        && (
+          !("espcam_img_url" in request.resource.data) ||
+          request.resource.data.espcam_img_url is string
+        );
+    }
+
+    match /monitoring/depok/log_data/{recordId} {
+      allow read: if true;
+      allow create: if validLogData();
+      allow update, delete: if false;
+    }
+
+    match /monitoring/depok/titik_lokasi_node/{docId} {
+      allow read: if false;
+      allow write: if false;
+    }
+
+    match /user/{userId} {
+      allow read, write: if false;
+    }
+  }
+}

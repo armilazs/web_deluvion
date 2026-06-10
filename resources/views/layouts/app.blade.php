@@ -27,6 +27,9 @@
             <a href="{{ route('devices') }}" class="nav-item {{ request()->routeIs('devices') ? 'active' : '' }}">
                 <i class="fas fa-microchip"></i> Perangkat
             </a>
+            <a href="{{ route('qos') }}" class="nav-item {{ request()->routeIs('qos') ? 'active' : '' }}">
+                <i class="fas fa-network-wired"></i> Kualitas Jaringan
+            </a>
             <a href="{{ route('logs') }}" class="nav-item {{ request()->routeIs('logs') ? 'active' : '' }}">
                 <i class="far fa-comment-dots"></i> Aktivitas Log
             </a>

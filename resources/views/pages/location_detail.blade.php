@@ -16,34 +16,37 @@
             <div class="online-badge">🟢 ONLINE</div>
         </div>
 
-        <div class="status-card interactive-card" style="margin-bottom: 24px; text-align: center;">
-            <div>
-                <h2>Status Terkini</h2>
-                <p>Berdasarkan data sensor terakhir</p>
+        <div style="display: grid; grid-template-columns: 280px 1fr; gap: 16px; margin-bottom: 12px;">
+            
+            <!-- Kotak Status Terkini -->
+            <div class="status-card interactive-card" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+                <h2 style="margin: 0 0 8px 0; font-size: 20px;">Status Terkini</h2>
+                <p style="margin: 0 0 24px 0; font-size: 13px; opacity: 0.9;">Berdasarkan sensor terakhir</p>
+                <div class="status-badge" id="locStatus" style="font-size: 20px; padding: 12px 24px; margin: 0;">MENUNGGU...</div>
             </div>
-            <div class="status-badge" id="locStatus" style="font-size: 24px; padding: 12px 32px; margin-top: 16px; margin-left: auto; margin-right: auto; display: inline-block;">MENUNGGU DATA...</div>
+
+            <!-- Kotak 4 Data Sensor -->
+            <div class="stats-grid" style="grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                <div class="stat-card interactive-card">
+                    <div class="label">Ketinggian Air (Cm)</div>
+                    <div class="value" id="locLevel">--</div>
+                </div>
+                <div class="stat-card interactive-card">
+                    <div class="label">Arus Air (L/menit)</div>
+                    <div class="value" id="locFlow">--</div>
+                </div>
+                <div class="stat-card interactive-card">
+                    <div class="label">Curah Hujan (Ombrometer)</div>
+                    <div class="value" id="locRain">--</div>
+                </div>
+                <div class="stat-card interactive-card">
+                    <div class="label">Kecepatan Angin (Anemometer)</div>
+                    <div class="value" id="locWind">--</div>
+                </div>
+            </div>
         </div>
 
-        <div class="stats-grid">
-            <div class="stat-card interactive-card">
-                <div class="label">Ketinggian Air (Cm)</div>
-                <div class="value" id="locLevel">--</div>
-            </div>
-            <div class="stat-card interactive-card">
-                <div class="label">Arus Air (L/menit)</div>
-                <div class="value" id="locFlow">--</div>
-            </div>
-            <div class="stat-card interactive-card">
-                <div class="label">Curah Hujan (Ombrometer)</div>
-                <div class="value" id="locRain">--</div>
-            </div>
-            <div class="stat-card interactive-card">
-                <div class="label">Kecepatan Angin (Anemometer)</div>
-                <div class="value" id="locWind">--</div>
-            </div>
-        </div>
-
-        <div class="chart-card interactive-card" style="margin-top: 24px; min-height: 300px;">
+        <div class="chart-card interactive-card" style="margin-top: 12px; min-height: 300px;">
             <div class="section-title">Grafik Historis {{ $locationName }}</div>
             <div style="position: relative; height: 250px; width: 100%;">
                 <canvas id="locChart"></canvas>
@@ -121,7 +124,7 @@
                     
                     if (locStatus) {
                         if (data.water_level > 150) {
-                            locStatus.innerText = "KRITIS";
+                            locStatus.innerText = "WASPADA";
                             locStatus.style.backgroundColor = "var(--danger-color)";
                         } else if (data.water_level > 100) {
                             locStatus.innerText = "SIAGA";

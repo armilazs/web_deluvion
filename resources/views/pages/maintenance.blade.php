@@ -35,7 +35,18 @@
                     <td style="padding: 12px; font-weight: 500;">{{ $schedule->title }}</td>
                     <td style="padding: 12px;">{{ $schedule->location }}</td>
                     <td style="padding: 12px;">
-                        <span class="status-badge" style="padding: 4px 12px; font-size: 12px; background: {{ $schedule->status == 'Selesai' ? '#dcfce7' : '#fef08a' }}; color: {{ $schedule->status == 'Selesai' ? '#166534' : '#ca8a04' }};">{{ $schedule->status }}</span>
+                        @php
+                            $bg = '#fef08a'; // default Terjadwal
+                            $color = '#ca8a04';
+                            if ($schedule->status == 'Selesai') {
+                                $bg = '#dcfce7';
+                                $color = '#166534';
+                            } elseif ($schedule->status == 'Sedang Berjalan') {
+                                $bg = '#e0f2fe';
+                                $color = '#0369a1';
+                            }
+                        @endphp
+                        <span class="status-badge" style="padding: 4px 12px; font-size: 12px; background: {{ $bg }}; color: {{ $color }}; font-weight: 600; border-radius: 6px;">{{ $schedule->status }}</span>
                     </td>
                     <td style="padding: 12px; display: flex; gap: 12px;">
                         <button onclick="openEditModal({{ $schedule->id }}, '{{ $schedule->title }}', '{{ $schedule->date }}', '{{ $schedule->location }}', '{{ $schedule->status }}', '{{ $schedule->description ?? '' }}')" style="background: none; border: none; color: var(--primary-blue); cursor: pointer;"><i class="fas fa-edit"></i> Edit</button>
@@ -87,10 +98,6 @@
             </div>
             <button type="submit" class="btn-primary">Simpan Jadwal</button>
         </form>
-    </div>
-</div>
-
-<script>
     </div>
 </div>
 

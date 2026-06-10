@@ -95,35 +95,13 @@
             <h3 class="section-title">Pengaturan Integrasi Peringatan</h3>
             
             <div style="display: flex; flex-direction: column; gap: 24px; margin-bottom: 32px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 16px; border-bottom: 1px solid var(--border-color);">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
                     <div>
                         <h4 style="margin-bottom: 4px;">Sirine Peringatan Dini (EWS)</h4>
-                        <p style="font-size: 12px; color: var(--text-secondary);">Aktifkan sirine di Node Hilir secara otomatis jika status Kritis.</p>
+                        <p style="font-size: 12px; color: var(--text-secondary);">Aktifkan sirine di Node Hilir secara otomatis jika status Waspada.</p>
                     </div>
                     <label class="toggle-switch">
                         <input type="checkbox" checked onchange="showToast('Status Sirine Otomatis diperbarui', 'info')">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-
-                <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 16px; border-bottom: 1px solid var(--border-color);">
-                    <div>
-                        <h4 style="margin-bottom: 4px;">Notifikasi Telegram Bot</h4>
-                        <p style="font-size: 12px; color: var(--text-secondary);">Kirim pesan siaga ke grup Telegram admin.</p>
-                    </div>
-                    <label class="toggle-switch">
-                        <input type="checkbox" checked onchange="showToast('Integrasi Telegram diperbarui', 'info')">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <h4 style="margin-bottom: 4px;">Email Alert Bulanan</h4>
-                        <p style="font-size: 12px; color: var(--text-secondary);">Terima rekap data pemeliharaan dan statistik bulanan.</p>
-                    </div>
-                    <label class="toggle-switch">
-                        <input type="checkbox" onchange="showToast('Pengaturan Email diperbarui', 'info')">
                         <span class="slider"></span>
                     </label>
                 </div>
