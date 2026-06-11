@@ -47,8 +47,13 @@
         transition: background 0.3s;
     }
 
-    .admin-node-card.hulu::before { background: var(--success-color, #22c55e); }
-    .admin-node-card.hilir::before { background: var(--danger-color, #ef4444); }
+    .admin-node-card.hulu::before {
+        background: var(--success-color, #22c55e);
+    }
+
+    .admin-node-card.hilir::before {
+        background: var(--danger-color, #ef4444);
+    }
 
     .admin-node-card.active {
         border-color: var(--primary-blue, #2563eb);
@@ -200,8 +205,6 @@
         text-align: center;
     }
 
-
-
     /* Live Badge */
     .status-badge {
         display: inline-flex;
@@ -318,28 +321,38 @@
 
 <div class="devices-container">
     <div style="margin-bottom: 20px;">
-        <h2 class="section-title" style="margin: 0; font-size: 22px; color: var(--text-primary);">Pusat Manajemen Sensor & Perangkat</h2>
+        <h2 class="section-title" style="margin: 0; font-size: 22px; color: var(--text-primary);">
+            Pusat Manajemen Sensor & Perangkat
+        </h2>
     </div>
 
     <div class="admin-grid">
-        
         <!-- LEFT: Perangkat List -->
         <div style="display: flex; flex-direction: column; gap: 16px;">
-            <div class="panel-section-title"><i class="fas fa-microchip"></i> Daftar Node Terhubung</div>
-            
+            <div class="panel-section-title">
+                <i class="fas fa-microchip"></i> Daftar Node Terhubung
+            </div>
+
             <!-- Hulu Card -->
             <div class="admin-node-card hulu" id="card-hulu" onclick="selectNode('hulu')">
                 <div class="node-header-row">
                     <div class="node-title-area">
                         <span class="badge">DEL-001</span>
                         <h3 id="huluNodeTitle" style="margin-top: 6px;">Node Hulu</h3>
-                        <p id="huluNodeLoc" style="margin: 0; font-size: 12px; color: var(--text-secondary);">Setu Pamulang</p>
+                        <p id="huluNodeLoc" style="margin: 0; font-size: 12px; color: var(--text-secondary);">
+                            Setu Pamulang
+                        </p>
                     </div>
                     <div class="status-badge online" id="huluOverallBadge">ONLINE</div>
                 </div>
+
                 <div class="mini-status-list">
-                    <span class="sensor-mini-tag online" id="huluMiniLvl"><i class="fas fa-water"></i> Lvl: Online</span>
-                    <span class="sensor-mini-tag online" id="huluMiniFlw"><i class="fas fa-fan"></i> Flow: Online</span>
+                    <span class="sensor-mini-tag online" id="huluMiniLvl">
+                        <i class="fas fa-water"></i> Lvl: Online
+                    </span>
+                    <span class="sensor-mini-tag online" id="huluMiniFlw">
+                        <i class="fas fa-fan"></i> Flow: Online
+                    </span>
                 </div>
             </div>
 
@@ -349,15 +362,26 @@
                     <div class="node-title-area">
                         <span class="badge">DEL-002</span>
                         <h3 id="hilirNodeTitle" style="margin-top: 6px;">Node Hilir</h3>
-                        <p id="hilirNodeLoc" style="margin: 0; font-size: 12px; color: var(--text-secondary);">BPI Pamulang</p>
+                        <p id="hilirNodeLoc" style="margin: 0; font-size: 12px; color: var(--text-secondary);">
+                            BPI Pamulang
+                        </p>
                     </div>
                     <div class="status-badge offline" id="hilirOverallBadge">OFFLINE</div>
                 </div>
+
                 <div class="mini-status-list">
-                    <span class="sensor-mini-tag offline" id="hilirMiniLvl"><i class="fas fa-times-circle"></i> Lvl: Off</span>
-                    <span class="sensor-mini-tag offline" id="hilirMiniRain"><i class="fas fa-times-circle"></i> Rain: Off</span>
-                    <span class="sensor-mini-tag offline" id="hilirMiniWind"><i class="fas fa-times-circle"></i> Wind: Off</span>
-                    <span class="sensor-mini-tag offline" id="hilirMiniSir"><i class="fas fa-times-circle"></i> Siren: Off</span>
+                    <span class="sensor-mini-tag offline" id="hilirMiniLvl">
+                        <i class="fas fa-times-circle"></i> Lvl: Off
+                    </span>
+                    <span class="sensor-mini-tag offline" id="hilirMiniRain">
+                        <i class="fas fa-times-circle"></i> Rain: Off
+                    </span>
+                    <span class="sensor-mini-tag offline" id="hilirMiniWind">
+                        <i class="fas fa-times-circle"></i> Wind: Off
+                    </span>
+                    <span class="sensor-mini-tag offline" id="hilirMiniSir">
+                        <i class="fas fa-times-circle"></i> Siren: Off
+                    </span>
                 </div>
             </div>
         </div>
@@ -368,23 +392,31 @@
             <div class="blank-state" id="panelBlankState">
                 <i class="fas fa-sliders-h"></i>
                 <h3>Panel Kontrol Belum Terpilih</h3>
-                <p>Klik salah satu kartu node di sebelah kiri untuk mulai melihat rincian sensor, mengubah status online/offline, dan melakukan simulasi pengiriman data.</p>
+                <p>
+                    Klik salah satu kartu node di sebelah kiri untuk mulai melihat rincian sensor,
+                    mengubah status online/offline, dan melakukan simulasi pengiriman data.
+                </p>
             </div>
 
-            <!-- Active control interface (Hidden by default) -->
+            <!-- Active control interface -->
             <div id="panelActiveState" style="display: none; flex-direction: column; flex: 1;">
-                
                 <!-- Panel Header -->
                 <div class="panel-header">
                     <div>
-                        <span class="badge" id="panelNodeId" style="font-family: monospace; font-size: 11px; background: #e0f2fe; color: #0369a1; padding: 2px 8px; border-radius: 4px; font-weight: 700;">DEL-000</span>
+                        <span class="badge" id="panelNodeId"
+                            style="font-family: monospace; font-size: 11px; background: #e0f2fe; color: #0369a1; padding: 2px 8px; border-radius: 4px; font-weight: 700;">
+                            DEL-000
+                        </span>
                         <h2 id="panelNodeTitle" style="margin-top: 6px;">Detail Perangkat</h2>
                     </div>
                     <div class="status-badge online" id="panelOverallBadge">ONLINE</div>
                 </div>
 
                 <!-- Sensor Table -->
-                <div class="panel-section-title"><i class="fas fa-tasks"></i> Status & Detail Sensor Individu</div>
+                <div class="panel-section-title">
+                    <i class="fas fa-tasks"></i> Status & Detail Sensor Individu
+                </div>
+
                 <table class="sensor-table">
                     <thead>
                         <tr>
@@ -399,26 +431,55 @@
                 </table>
 
                 <!-- Kontrol Aktuator Khusus -->
-                <div id="actuatorControlSection" style="display: none; margin-top: 16px; border-top: 1px dashed var(--border-color); padding-top: 24px;">
-                    <div class="panel-section-title"><i class="fas fa-volume-up"></i> Kontrol Aktuator (Sirine Peringatan)</div>
-                    <div style="display: flex; align-items: center; justify-content: space-between; background: #f8fafc; padding: 16px 20px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                <div id="actuatorControlSection"
+                    style="display: none; margin-top: 16px; border-top: 1px dashed var(--border-color); padding-top: 24px;">
+                    <div class="panel-section-title">
+                        <i class="fas fa-volume-up"></i> Kontrol Aktuator (Sirine Peringatan)
+                    </div>
+
+                    <div
+                        style="display: flex; align-items: center; justify-content: space-between; background: #f8fafc; padding: 16px 20px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
                         <div>
-                            <h4 style="margin: 0 0 6px 0; font-size: 15px; color: var(--text-primary);">Sirine Manual Darurat</h4>
-                            <p style="margin: 0; font-size: 12px; color: var(--text-secondary);">Aktifkan peringatan sirine secara paksa mengabaikan status sensor ketinggian air.</p>
+                            <h4 style="margin: 0 0 6px 0; font-size: 15px; color: var(--text-primary);">
+                                Sirine Manual Darurat
+                            </h4>
+                            <p style="margin: 0; font-size: 12px; color: var(--text-secondary);">
+                                Aktifkan peringatan sirine secara paksa mengabaikan status sensor ketinggian air.
+                            </p>
                         </div>
-                        <button id="sireneToggleButtonDevice" style="padding: 12px 28px; border-radius: 8px; border: 2px solid #cbd5e1; background: #94a3b8; color: white; font-weight: bold; font-size: 14px; cursor: pointer; transition: all 0.2s; min-width: 140px; text-shadow: 0 1px 2px rgba(0,0,0,0.2);">MATI</button>
+
+                        <button id="sireneToggleButtonDevice"
+                            style="padding: 12px 28px; border-radius: 8px; border: 2px solid #cbd5e1; background: #94a3b8; color: white; font-weight: bold; font-size: 14px; cursor: pointer; transition: all 0.2s; min-width: 140px; text-shadow: 0 1px 2px rgba(0,0,0,0.2);">
+                            MATI
+                        </button>
                     </div>
                 </div>
-
             </div>
         </div>
-
     </div>
 </div>
 
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, collection, query, orderBy, limit, onSnapshot, addDoc, serverTimestamp, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import {
+        initializeApp
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+
+    import {
+        getAuth,
+        onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    import {
+        getFirestore,
+        collection,
+        query,
+        orderBy,
+        limit,
+        onSnapshot,
+        serverTimestamp,
+        doc,
+        setDoc
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     // Firebase Credentials
     const firebaseConfig = {
@@ -433,9 +494,13 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    let currentFirebaseUser = null;
 
     // Memory caches for configs and logs
     window.selectedNodeId = null;
+
     let configHulu = {
         nama_node: "Node Hulu",
         lokasi: "Setu Pamulang",
@@ -444,6 +509,7 @@
         status_water_level: true,
         status_water_flow: true
     };
+
     let configHilir = {
         nama_node: "BPI PAMULANG Hilir",
         lokasi: "Titik Hilir Saluran Air",
@@ -455,51 +521,98 @@
         status_sirine: false
     };
 
-    let cachedLogsHulu = { water_level: 60, water_flow: 12 };
-    let cachedLogsHilir = { water_level: 45, ombrometer: 15, anemometer: 8, sirine_status: false };
+    let cachedLogsHulu = {
+        water_level: 60,
+        water_flow: 12
+    };
 
-    // Setups onSnapshot Firestore list for configurations
+    let cachedLogsHilir = {
+        water_level: 45,
+        ombrometer: 15,
+        anemometer: 8,
+        sirine_status: false
+    };
+
+    const sireneBtn = document.getElementById('sireneToggleButtonDevice');
+
+    if (sireneBtn) {
+        sireneBtn.disabled = true;
+        sireneBtn.title = "Menunggu autentikasi Firebase...";
+    }
+
+    onAuthStateChanged(auth, (user) => {
+        currentFirebaseUser = user;
+
+        if (sireneBtn) {
+            if (user) {
+                sireneBtn.disabled = false;
+                sireneBtn.title = "Kontrol sirine manual";
+            } else {
+                sireneBtn.disabled = true;
+                sireneBtn.title = "Login Firebase diperlukan untuk mengubah sirine";
+            }
+        }
+    });
+
+    // Setup onSnapshot Firestore list for configurations
     try {
         const configColRef = collection(db, 'monitoring', 'depok', 'device_config');
+
         onSnapshot(configColRef, (snapshot) => {
             snapshot.forEach((doc) => {
                 const data = doc.data();
+
                 if (doc.id === 'hulu') {
-                    configHulu = { ...configHulu, ...data };
+                    configHulu = {
+                        ...configHulu,
+                        ...data
+                    };
                     updateNodeSummaryCard('hulu', configHulu);
                 }
+
                 // Hilir is temporarily locked to offline default until configured physically
             });
-            if (window.selectedNodeId) refreshPanelData();
+
+            if (window.selectedNodeId) {
+                refreshPanelData();
+            }
         });
-    } catch(err) {
+    } catch (err) {
         console.error("Config fetch error: ", err);
     }
 
     // Setup onSnapshot Firestore list for logs
     const logDataRef = collection(db, 'monitoring', 'depok', 'log_data');
     const q = query(logDataRef, orderBy('time', 'desc'), limit(30));
+
     onSnapshot(q, (snapshot) => {
-        if (snapshot.empty) return;
-        
+        if (snapshot.empty) {
+            return;
+        }
+
         let latestHulu = null;
         let latestHilir = null;
 
         snapshot.forEach((doc) => {
             const data = doc.data();
+
             if (data.penempatan === 'hulu' && !latestHulu) {
                 latestHulu = data;
-                cachedLogsHulu = { ...cachedLogsHulu, ...data };
+                cachedLogsHulu = {
+                    ...cachedLogsHulu,
+                    ...data
+                };
             } else if (data.penempatan === 'hilir' && !latestHilir) {
                 latestHilir = data;
-                cachedLogsHilir = { ...cachedLogsHilir, ...data };
+                cachedLogsHilir = {
+                    ...cachedLogsHilir,
+                    ...data
+                };
             }
         });
 
-        // Update overall badges
         updateOverallKonektivitas();
 
-        // Refresh panel real-time fields
         if (window.selectedNodeId) {
             refreshPanelData();
         }
@@ -509,10 +622,15 @@
     function updateNodeSummaryCard(node, config) {
         const titleEl = document.getElementById(node + 'NodeTitle');
         const locEl = document.getElementById(node + 'NodeLoc');
-        if (titleEl) titleEl.innerText = config.nama_node;
-        if (locEl) locEl.innerText = config.lokasi;
 
-        // Update mini tags status
+        if (titleEl) {
+            titleEl.innerText = config.nama_node;
+        }
+
+        if (locEl) {
+            locEl.innerText = config.lokasi;
+        }
+
         if (node === 'hulu') {
             updateMiniTag('huluMiniLvl', config.status_water_level, 'Lvl');
             updateMiniTag('huluMiniFlw', config.status_water_flow, 'Flow');
@@ -522,47 +640,61 @@
             updateMiniTag('hilirMiniWind', config.status_anemometer, 'Wind');
             updateMiniTag('hilirMiniSir', config.status_sirine, 'Siren');
         }
+
         updateOverallKonektivitas();
     }
 
     function updateMiniTag(elementId, isOnline, label) {
         const el = document.getElementById(elementId);
-        if (!el) return;
+
+        if (!el) {
+            return;
+        }
+
         el.className = `sensor-mini-tag ${isOnline !== false ? 'online' : 'offline'}`;
-        el.innerHTML = isOnline !== false ? `<i class="fas fa-check-circle"></i> ${label}: Online` : `<i class="fas fa-times-circle"></i> ${label}: Off`;
+        el.innerHTML = isOnline !== false ?
+            `<i class="fas fa-check-circle"></i> ${label}: Online` :
+            `<i class="fas fa-times-circle"></i> ${label}: Off`;
     }
 
     function updateOverallKonektivitas() {
         const now = new Date();
-        const timeoutMs = 5 * 60 * 1000; // 5 menit
-        
+        const timeoutMs = 5 * 60 * 1000;
+
         function isLogActive(logData) {
-            if (!logData || !logData.time) return false;
+            if (!logData || !logData.time) {
+                return false;
+            }
+
             let logTime = new Date();
+
             if (logData.time.toDate) {
                 logTime = logData.time.toDate();
             } else if (typeof logData.time === 'string') {
                 logTime = new Date(logData.time.replace(' ', 'T'));
             }
+
             return (now - logTime) <= timeoutMs;
         }
 
-        // Hulu overall status
         const isHuluConfigOn = configHulu.status_water_level !== false || configHulu.status_water_flow !== false;
         const isHuluOnline = isHuluConfigOn && isLogActive(cachedLogsHulu);
         const huluBadge = document.getElementById('huluOverallBadge');
+
         if (huluBadge) {
             huluBadge.className = `status-badge ${isHuluOnline ? 'online' : 'offline'}`;
             huluBadge.innerText = isHuluOnline ? 'ONLINE' : 'OFFLINE';
         }
 
-        // Hilir overall status
-        const isHilirConfigOn = configHilir.status_water_level !== false || 
-                             configHilir.status_ombrometer !== false || 
-                             configHilir.status_anemometer !== false || 
-                             configHilir.status_sirine !== false;
+        const isHilirConfigOn =
+            configHilir.status_water_level !== false ||
+            configHilir.status_ombrometer !== false ||
+            configHilir.status_anemometer !== false ||
+            configHilir.status_sirine !== false;
+
         const isHilirOnline = isHilirConfigOn && isLogActive(cachedLogsHilir);
         const hilirBadge = document.getElementById('hilirOverallBadge');
+
         if (hilirBadge) {
             hilirBadge.className = `status-badge ${isHilirOnline ? 'online' : 'offline'}`;
             hilirBadge.innerText = isHilirOnline ? 'ONLINE' : 'OFFLINE';
@@ -572,73 +704,123 @@
     // Node selection
     window.selectNode = function(nodeId) {
         window.selectedNodeId = nodeId;
-        
-        // Active visual card state
-        document.querySelectorAll('.admin-node-card').forEach(card => card.classList.remove('active'));
-        document.getElementById('card-' + nodeId).classList.add('active');
 
-        // Hide blank placeholder, show interface
+        document.querySelectorAll('.admin-node-card').forEach(card => card.classList.remove('active'));
+
+        const selectedCard = document.getElementById('card-' + nodeId);
+
+        if (selectedCard) {
+            selectedCard.classList.add('active');
+        }
+
         document.getElementById('panelBlankState').style.display = 'none';
         document.getElementById('panelActiveState').style.display = 'flex';
 
-        // Render dynamic items
         refreshPanelData();
     };
 
-    // Refreshes the active management panel
     function refreshPanelData() {
-        if (!window.selectedNodeId) return;
+        if (!window.selectedNodeId) {
+            return;
+        }
+
         const nodeId = window.selectedNodeId;
         const config = nodeId === 'hulu' ? configHulu : configHilir;
         const logs = nodeId === 'hulu' ? cachedLogsHulu : cachedLogsHilir;
 
-        // Header info
         document.getElementById('panelNodeId').innerText = nodeId === 'hulu' ? 'DEL-001' : 'DEL-002';
         document.getElementById('panelNodeTitle').innerText = config.nama_node;
-        
+
         const now = new Date();
         const timeoutMs = 5 * 60 * 1000;
         let logActive = false;
+
         if (logs && logs.time) {
             let logTime = new Date();
-            if (logs.time.toDate) logTime = logs.time.toDate();
-            else if (typeof logs.time === 'string') logTime = new Date(logs.time.replace(' ', 'T'));
+
+            if (logs.time.toDate) {
+                logTime = logs.time.toDate();
+            } else if (typeof logs.time === 'string') {
+                logTime = new Date(logs.time.replace(' ', 'T'));
+            }
+
             logActive = (now - logTime) <= timeoutMs;
         }
 
-        const isConfigOn = nodeId === 'hulu' ? 
-            (configHulu.status_water_level !== false || configHulu.status_water_flow !== false) : 
-            (configHilir.status_water_level !== false || configHilir.status_ombrometer !== false || configHilir.status_anemometer !== false || configHilir.status_sirine !== false);
-        
+        const isConfigOn = nodeId === 'hulu' ?
+            (configHulu.status_water_level !== false || configHulu.status_water_flow !== false) :
+            (
+                configHilir.status_water_level !== false ||
+                configHilir.status_ombrometer !== false ||
+                configHilir.status_anemometer !== false ||
+                configHilir.status_sirine !== false
+            );
+
         const isNodeOnline = isConfigOn && logActive;
 
         const panelBadge = document.getElementById('panelOverallBadge');
         panelBadge.className = `status-badge ${isNodeOnline ? 'online' : 'offline'}`;
         panelBadge.innerText = isNodeOnline ? 'ONLINE' : 'OFFLINE';
 
-        // Define sensor arrays
         let sensors = [];
+
         if (nodeId === 'hulu') {
-            sensors = [
-                { key: 'water_level', label: 'Sensor Ketinggian Air (Water Level)', icon: 'fa-water', value: logs.water_level !== undefined ? logs.water_level + ' cm' : '--', status: config.status_water_level },
-                { key: 'water_flow', label: 'Sensor Debit Arus (Water Flow)', icon: 'fa-fan', value: logs.water_flow !== undefined ? logs.water_flow + ' L/min' : '--', status: config.status_water_flow }
+            sensors = [{
+                    key: 'water_level',
+                    label: 'Sensor Ketinggian Air (Water Level)',
+                    icon: 'fa-water',
+                    value: logs.water_level !== undefined ? logs.water_level + ' cm' : '--',
+                    status: config.status_water_level
+                },
+                {
+                    key: 'water_flow',
+                    label: 'Sensor Debit Arus (Water Flow)',
+                    icon: 'fa-fan',
+                    value: logs.water_flow !== undefined ? logs.water_flow + ' L/min' : '--',
+                    status: config.status_water_flow
+                }
             ];
         } else {
             const levelVal = logs.water_level !== undefined ? logs.water_level : 0;
             const isSirenTriggered = logs.sirine_status === true || (levelVal >= (config.threshold_waspada || 150));
-            sensors = [
-                { key: 'water_level', label: 'Sensor Ketinggian Air (Water Level)', icon: 'fa-water', value: logs.water_level !== undefined ? logs.water_level + ' cm' : '--', status: config.status_water_level },
-                { key: 'ombrometer', label: 'Sensor Curah Hujan (Ombrometer)', icon: 'fa-cloud-showers-heavy', value: logs.ombrometer !== undefined ? logs.ombrometer + ' mm/j' : '--', status: config.status_ombrometer },
-                { key: 'anemometer', label: 'Sensor Kecepatan Angin', icon: 'fa-wind', value: logs.anemometer !== undefined ? logs.anemometer + ' km/h' : '--', status: config.status_anemometer },
-                { key: 'sirine', label: 'Sirine Alarm Peringatan (EWS)', icon: 'fa-bullhorn', value: isSirenTriggered ? 'AKTIF (MELENGKING)' : 'AMAN (MATI)', status: config.status_sirine }
+
+            sensors = [{
+                    key: 'water_level',
+                    label: 'Sensor Ketinggian Air (Water Level)',
+                    icon: 'fa-water',
+                    value: logs.water_level !== undefined ? logs.water_level + ' cm' : '--',
+                    status: config.status_water_level
+                },
+                {
+                    key: 'ombrometer',
+                    label: 'Sensor Curah Hujan (Ombrometer)',
+                    icon: 'fa-cloud-showers-heavy',
+                    value: logs.ombrometer !== undefined ? logs.ombrometer + ' mm/j' : '--',
+                    status: config.status_ombrometer
+                },
+                {
+                    key: 'anemometer',
+                    label: 'Sensor Kecepatan Angin',
+                    icon: 'fa-wind',
+                    value: logs.anemometer !== undefined ? logs.anemometer + ' km/h' : '--',
+                    status: config.status_anemometer
+                },
+                {
+                    key: 'sirine',
+                    label: 'Sirine Alarm Peringatan (EWS)',
+                    icon: 'fa-bullhorn',
+                    value: isSirenTriggered ? 'AKTIF (MELENGKING)' : 'AMAN (MATI)',
+                    status: config.status_sirine
+                }
             ];
         }
 
-        // Render Table Body
         const tableBody = document.getElementById('sensorTableBody');
         tableBody.innerHTML = '';
+
         sensors.forEach(s => {
             const tr = document.createElement('tr');
+
             tr.innerHTML = `
                 <td>
                     <div class="sensor-name-cell">
@@ -646,38 +828,39 @@
                         ${s.label}
                     </div>
                 </td>
-                <td style="font-family: monospace; font-size: 14px; font-weight: 600;">${s.value}</td>
+                <td style="font-family: monospace; font-size: 14px; font-weight: 600;">
+                    ${s.value}
+                </td>
                 <td>
                     <span class="status-badge ${s.status !== false ? 'online' : 'offline'}" style="font-size: 10px;">
                         ${s.status !== false ? 'AKTIF (MEMBACA)' : 'NONAKTIF'}
                     </span>
                 </td>
             `;
+
             tableBody.appendChild(tr);
         });
 
-        // Show/Hide Actuator Control for Hilir only
         const actuatorSection = document.getElementById('actuatorControlSection');
+
         if (actuatorSection) {
             actuatorSection.style.display = nodeId === 'hilir' ? 'block' : 'none';
         }
     }
 
     // KONTROL SIRINE MANUAL REALTIME
-    const sireneBtn = document.getElementById('sireneToggleButtonDevice');
     let currentSireneState = false;
 
     if (sireneBtn) {
         const sireneDocRef = doc(db, 'monitoring', 'depok', 'sirene', 'status');
-        
-        // Listen to Sirene Status Real-time
+
         onSnapshot(sireneDocRef, (docSnap) => {
             if (docSnap.exists()) {
                 currentSireneState = docSnap.data().is_active === true;
             } else {
                 currentSireneState = false;
             }
-            
+
             if (currentSireneState) {
                 sireneBtn.style.background = 'var(--danger-color)';
                 sireneBtn.style.borderColor = '#fca5a5';
@@ -692,18 +875,35 @@
             }
         });
 
-        // Toggle Sirene State on Click
         sireneBtn.addEventListener('click', async () => {
+            if (!currentFirebaseUser) {
+                alert("Akses ditolak. Silakan login ulang.");
+                return;
+            }
+
             const newState = !currentSireneState;
+
+            sireneBtn.disabled = true;
             sireneBtn.innerText = '...';
+
             try {
-                await setDoc(sireneDocRef, { is_active: newState }, { merge: true });
-            } catch(err) {
+                await setDoc(sireneDocRef, {
+                    is_active: newState,
+                    updated_at: serverTimestamp(),
+                    updated_by: currentFirebaseUser.email || currentFirebaseUser.uid,
+                    source: 'web_admin'
+                }, {
+                    merge: true
+                });
+
+                currentSireneState = newState;
+            } catch (err) {
                 console.error("Gagal mengubah status sirine:", err);
-                alert("Gagal menyalakan sirine manual.");
+                alert("Gagal mengubah status sirine manual.");
+            } finally {
+                sireneBtn.disabled = false;
             }
         });
     }
-
 </script>
 @endsection

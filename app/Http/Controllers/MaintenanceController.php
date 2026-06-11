@@ -4,53 +4,108 @@ namespace App\Http\Controllers;
 
 use App\Models\Maintenance;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class MaintenanceController extends Controller
 {
     public function index()
     {
         $schedules = Maintenance::orderBy('date', 'desc')->get();
+
         return view('pages.maintenance', compact('schedules'));
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'date' => 'required|date',
-            'location' => 'required|string',
+        $validated = $request->validate([
+            'title' => [
+                'required',
+                'string',
+                'max:100',
+            ],
+            'date' => [
+                'required',
+                'date',
+            ],
+            'location' => [
+                'required',
+                'string',
+                Rule::in([
+                    'Hulu (Setu Pamulang)',
+                    'Hilir (BPI Pamulang)',
+                    'Lokasi Lainnya',
+                ]),
+            ],
+            'description' => [
+                'nullable',
+                'string',
+                'max:500',
+            ],
         ]);
 
         Maintenance::create([
-            'title' => $request->title,
-            'date' => $request->date,
-            'location' => $request->location,
+            'title' => $validated['title'],
+            'date' => $validated['date'],
+            'location' => $validated['location'],
             'status' => 'Terjadwal',
-            'description' => $request->description,
+            'description' => $validated['description'] ?? null,
         ]);
 
-        return redirect()->back()->with('success', 'Jadwal berhasil ditambahkan!');
+        return redirect()
+            ->back()
+            ->with('success', 'Jadwal berhasil ditambahkan!');
     }
 
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'date' => 'required|date',
-            'location' => 'required|string',
-            'status' => 'required|string',
-        ]);
-
         $maintenance = Maintenance::findOrFail($id);
-        $maintenance->update([
-            'title' => $request->title,
-            'date' => $request->date,
-            'location' => $request->location,
-            'status' => $request->status,
-            'description' => $request->description,
+
+        $validated = $request->validate([
+            'title' => [
+                'required',
+                'string',
+                'max:100',
+            ],
+            'date' => [
+                'required',
+                'date',
+            ],
+            'location' => [
+                'required',
+                'string',
+                Rule::in([
+                    'Hulu (Setu Pamulang)',
+                    'Hilir (BPI Pamulang)',
+                    'Lokasi Lainnya',
+                ]),
+            ],
+            'status' => [
+                'required',
+                'string',
+                Rule::in([
+                    'Terjadwal',
+                    'Sedang Berjalan',
+                    'Selesai',
+                ]),
+            ],
+            'description' => [
+                'nullable',
+                'string',
+                'max:500',
+            ],
         ]);
 
-        return redirect()->back()->with('success', 'Jadwal berhasil diperbarui!');
+        $maintenance->update([
+            'title' => $validated['title'],
+            'date' => $validated['date'],
+            'location' => $validated['location'],
+            'status' => $validated['status'],
+            'description' => $validated['description'] ?? null,
+        ]);
+
+        return redirect()
+            ->back()
+            ->with('success', 'Jadwal berhasil diperbarui!');
     }
 
     public function destroy($id)
@@ -58,6 +113,8 @@ class MaintenanceController extends Controller
         $maintenance = Maintenance::findOrFail($id);
         $maintenance->delete();
 
-        return redirect()->back()->with('success', 'Jadwal berhasil dihapus!');
+        return redirect()
+            ->back()
+            ->with('success', 'Jadwal berhasil dihapus!');
     }
 }

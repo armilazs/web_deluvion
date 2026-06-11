@@ -25,3 +25,13 @@ Thumbs.db
 
 # Ignore Firebase Credentials
 *firebase-auth.json
+.env
+!.env.example
+
+/storage/*.key
+/storage/app/private/*
+firebase-service-account.json
+*.pem
+*.key
+*.sql
+*.sql.enc
