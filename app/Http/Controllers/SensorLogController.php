@@ -6,15 +6,19 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Rules\Password;
 
-class SettingsController extends Controller
+class SensorLogController extends Controller
 {
     private string $projectId = 'deluvion-23';
 
     private function firestoreBaseUrl(): string
     {
         return "https://firestore.googleapis.com/v1/projects/{$this->projectId}/databases/(default)/documents";
+    }
+
+    private function logCollectionPath(): string
+    {
+        return 'monitoring/depok/log_data';
     }
 
     private function auditCollectionPath(): string
@@ -138,72 +142,63 @@ class SettingsController extends Controller
 
             Http::withToken($token)->post($url, $payload);
         } catch (\Throwable $e) {
-            Log::warning('Gagal menyimpan audit log tambah admin', [
+            Log::warning('Gagal menyimpan audit log hapus sensor', [
                 'message' => $e->getMessage(),
                 'action' => $action,
             ]);
         }
     }
 
-    public function addAdmin(Request $request)
+    public function clear(Request $request)
     {
-        $validated = $request->validate([
-            'name' => [
-                'required',
-                'string',
-                'max:100',
-            ],
-            'email' => [
-                'required',
-                'string',
-                'email',
-                'max:150',
-            ],
-            'password' => [
-                'required',
-                'string',
-                Password::min(8),
-            ],
-        ]);
-
         try {
-            $auth = app('firebase.auth');
+            $token = $this->getAccessToken();
 
-            $createdUser = $auth->createUser([
-                'displayName' => $validated['name'],
-                'email' => $validated['email'],
-                'password' => $validated['password'],
-                'emailVerified' => false,
-                'disabled' => false,
+            $listUrl = $this->firestoreBaseUrl() . '/' . $this->logCollectionPath();
+
+            $listResponse = Http::withToken($token)->get($listUrl);
+
+            if (!$listResponse->successful()) {
+                throw new \Exception('Gagal membaca log_data dari Firestore REST.');
+            }
+
+            $documents = $listResponse->json('documents') ?? [];
+
+            $deleted = 0;
+
+            foreach ($documents as $document) {
+                $documentName = $document['name'] ?? null;
+
+                if (!$documentName) {
+                    continue;
+                }
+
+                $deleteResponse = Http::withToken($token)->delete(
+                    'https://firestore.googleapis.com/v1/' . $documentName
+                );
+
+                if ($deleteResponse->successful()) {
+                    $deleted++;
+                }
+            }
+
+            $this->auditLog($request, 'clear_sensor_logs', [
+                'deleted_count' => $deleted,
             ]);
 
-            $this->auditLog($request, 'create_admin_account', [
-                'created_admin_uid' => $createdUser->uid,
-                'created_admin_email' => $validated['email'],
-                'created_admin_name' => $validated['name'],
+            return response()->json([
+                'success' => true,
+                'deleted' => $deleted,
             ]);
-
-            return redirect()
-                ->back()
-                ->with('success', 'Admin baru berhasil didaftarkan di Firebase Authentication.');
-        } catch (\Kreait\Firebase\Exception\Auth\EmailExists $e) {
-            return redirect()
-                ->back()
-                ->withErrors([
-                    'email' => 'Email tersebut sudah terdaftar sebagai admin.',
-                ])
-                ->withInput();
         } catch (\Throwable $e) {
-            Log::error('Gagal menambahkan admin baru', [
+            Log::error('Gagal menghapus log sensor dari Firestore REST', [
                 'message' => $e->getMessage(),
             ]);
 
-            return redirect()
-                ->back()
-                ->withErrors([
-                    'firebase' => 'Gagal menambahkan admin baru. Periksa konfigurasi Firebase service account.',
-                ])
-                ->withInput();
+            return response()->json([
+                'success' => false,
+                'error' => 'Gagal menghapus log sensor.',
+            ], 500);
         }
     }
 }

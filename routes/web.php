@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\SensorLogController;
 
 Route::get('/', function () {
     return view('auth.login');
@@ -53,7 +54,7 @@ Route::post('/firebase-login', function (Request $request) {
             'message' => 'Token Firebase tidak valid atau sudah kedaluwarsa.'
         ], 401);
     }
-})->name('firebase.login');
+})->middleware('throttle:10,1')->name('firebase.login');
 
 Route::post('/logout', function (Request $request) {
     $request->session()->flush();
@@ -87,46 +88,30 @@ Route::middleware(['firebase.login'])->group(function () {
 });
 
 Route::middleware(['admin'])->group(function () {
-    Route::get('/maintenance', [MaintenanceController::class, 'index'])->name('maintenance');
-    Route::post('/maintenance', [MaintenanceController::class, 'store'])->name('maintenance.store');
-    Route::post('/maintenance/{id}', [MaintenanceController::class, 'update'])->name('maintenance.update');
-    Route::delete('/maintenance/{id}', [MaintenanceController::class, 'destroy'])->name('maintenance.destroy');
+    Route::get('/maintenance', [MaintenanceController::class, 'index'])
+        ->name('maintenance');
+
+    Route::post('/maintenance', [MaintenanceController::class, 'store'])
+        ->middleware('throttle:20,1')
+        ->name('maintenance.store');
+
+    Route::post('/maintenance/{id}', [MaintenanceController::class, 'update'])
+        ->middleware('throttle:20,1')
+        ->name('maintenance.update');
+
+    Route::delete('/maintenance/{id}', [MaintenanceController::class, 'destroy'])
+        ->middleware('throttle:20,1')
+        ->name('maintenance.destroy');
 
     Route::get('/settings', function () {
         return view('pages.settings');
     })->name('settings');
 
-    Route::post('/settings/add-admin', [SettingsController::class, 'addAdmin'])->name('settings.add_admin');
+    Route::post('/settings/add-admin', [SettingsController::class, 'addAdmin'])
+        ->middleware('throttle:5,1')
+        ->name('settings.add_admin');
 
-    Route::post('/clear-sensor-logs', function () {
-        try {
-            $firestore = app('firebase.firestore')->database();
-            $logsRef = $firestore->collection('monitoring/depok/log_data');
-            $documents = $logsRef->documents();
-
-            $batch = $firestore->batch();
-            $count = 0;
-
-            foreach ($documents as $document) {
-                if ($document->exists()) {
-                    $batch->delete($document->reference());
-                    $count++;
-                }
-            }
-
-            if ($count > 0) {
-                $batch->commit();
-            }
-
-            return response()->json([
-                'success' => true,
-                'deleted' => $count
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'error' => 'Gagal menghapus log sensor.'
-            ], 500);
-        }
-    })->name('logs.clear');
+    Route::post('/clear-sensor-logs', [SensorLogController::class, 'clear'])
+        ->middleware('throttle:3,1')
+        ->name('logs.clear');
 });
