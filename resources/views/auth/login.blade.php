@@ -123,20 +123,35 @@
 
                 const idToken = await userCredential.user.getIdToken();
 
+                const csrfToken = document
+                    .querySelector('meta[name="csrf-token"]')
+                    .getAttribute("content");
+
                 const response = await fetch("{{ route('firebase.login') }}", {
                     method: "POST",
+                    credentials: "same-origin",
                     headers: {
                         "Content-Type": "application/json",
-                        "X-CSRF-TOKEN": document
-                            .querySelector('meta[name="csrf-token"]')
-                            .getAttribute("content")
+                        "Accept": "application/json",
+                        "X-Requested-With": "XMLHttpRequest",
+                        "X-CSRF-TOKEN": csrfToken
                     },
                     body: JSON.stringify({
                         idToken: idToken
                     })
                 });
 
-                const result = await response.json();
+                const contentType = response.headers.get("content-type") || "";
+
+                let result = {};
+
+                if (contentType.includes("application/json")) {
+                    result = await response.json();
+                } else {
+                    const text = await response.text();
+                    console.error("Server tidak mengembalikan JSON:", text);
+                    throw new Error("Session login kedaluwarsa. Refresh halaman lalu coba login ulang.");
+                }
 
                 if (!response.ok || !result.success) {
                     throw new Error(result.message || "Login gagal diproses oleh server.");

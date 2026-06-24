@@ -3,202 +3,392 @@
 @section('title', 'Aktivitas Log')
 
 @section('content')
-<div class="dashboard-grid" style="grid-template-columns: 1fr;">
-    <div class="widget-card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-            <h2 class="section-title" style="margin: 0;">Log Sistem & Riwayat Deteksi</h2>
+<style>
+    .logs-card {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+        border: 1px solid #e2e8f0;
+    }
 
-            <div>
-                <button
-                    class="btn-primary"
-                    onclick="exportToCSV()"
-                    style="width: auto; padding: 8px 16px; background: var(--bg-color); color: var(--primary-blue); border: 1px solid var(--primary-blue); margin-right: 8px;">
-                    <i class="fas fa-file-export"></i> Ekspor CSV
-                </button>
+    .logs-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 22px;
+        flex-wrap: wrap;
+    }
+
+    .logs-tabs {
+        display: flex;
+        gap: 28px;
+        border-bottom: 1px solid #e2e8f0;
+        margin-bottom: 20px;
+        overflow-x: auto;
+    }
+
+    .logs-tab-btn {
+        border: none;
+        background: transparent;
+        padding: 12px 0;
+        color: #64748b;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        white-space: nowrap;
+        border-bottom: 2px solid transparent;
+    }
+
+    .logs-tab-btn.active {
+        color: var(--primary-blue);
+        border-bottom-color: var(--primary-blue);
+    }
+
+    .logs-pane {
+        display: none;
+    }
+
+    .logs-pane.active {
+        display: block;
+    }
+
+    .logs-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 18px;
+    }
+
+    .logs-description {
+        color: var(--text-secondary);
+        font-size: 14px;
+        margin: 0;
+    }
+
+    .logs-select {
+        padding: 8px 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 10px;
+        background: #ffffff;
+        color: var(--text-primary);
+        font-size: 14px;
+        min-width: 180px;
+        outline: none;
+    }
+
+    .logs-table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+    }
+
+    .logs-table {
+        width: 100%;
+        min-width: 900px;
+        border-collapse: collapse;
+        font-size: 14px;
+    }
+
+    .logs-table thead {
+        background: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .logs-table th,
+    .logs-table td {
+        padding: 12px 14px;
+        text-align: left;
+        white-space: nowrap;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .logs-table th {
+        color: #475569;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .logs-table td {
+        color: #1e293b;
+    }
+
+    .activity-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .activity-card {
+        display: grid;
+        grid-template-columns: 46px 1fr;
+        gap: 12px;
+        padding: 14px;
+        border-radius: 14px;
+        border: 1px solid #e2e8f0;
+        background: #ffffff;
+    }
+
+    .activity-icon {
+        width: 46px;
+        height: 46px;
+        border-radius: 14px;
+        background: #eff6ff;
+        color: var(--primary-blue);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .activity-title {
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 6px;
+        word-break: break-word;
+    }
+
+    .activity-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        color: #64748b;
+        font-size: 12px;
+        margin-bottom: 8px;
+    }
+
+    .activity-detail {
+        background: #f8fafc;
+        border-radius: 10px;
+        padding: 10px;
+        color: #475569;
+        font-size: 13px;
+        word-break: break-word;
+        white-space: pre-wrap;
+    }
+
+    .image-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 16px;
+    }
+
+    .image-card {
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        overflow: hidden;
+        background: #ffffff;
+    }
+
+    .image-card img {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+        display: block;
+        background: #f1f5f9;
+    }
+
+    .image-card-body {
+        padding: 12px;
+    }
+
+    .image-title {
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 4px;
+    }
+
+    .image-meta {
+        color: #64748b;
+        font-size: 13px;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+    .empty-box {
+        width: 100%;
+        padding: 44px 20px;
+        text-align: center;
+        color: #64748b;
+    }
+
+    .export-btn {
+        width: auto;
+        padding: 8px 16px;
+        background: var(--bg-color);
+        color: var(--primary-blue);
+        border: 1px solid var(--primary-blue);
+    }
+
+    @media (max-width: 768px) {
+        .logs-card {
+            padding: 18px;
+        }
+
+        .logs-header {
+            align-items: stretch;
+        }
+
+        .export-btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .logs-toolbar {
+            align-items: stretch;
+        }
+
+        .logs-select {
+            width: 100%;
+        }
+
+        .activity-card {
+            grid-template-columns: 1fr;
+        }
+
+        .image-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="logs-card">
+    <div class="logs-header">
+        <h2 class="section-title" style="margin: 0;">Log Sistem & Riwayat Deteksi</h2>
+
+        <button type="button" class="btn-primary export-btn" onclick="exportCurrentLogCSV()">
+            <i class="fas fa-file-export"></i> Ekspor CSV
+        </button>
+    </div>
+
+    <div class="logs-tabs">
+        <button type="button" class="logs-tab-btn active" data-tab="webLogs">Log Aktivitas Web</button>
+        <button type="button" class="logs-tab-btn" data-tab="sensorLogs">Log Sensor</button>
+        <button type="button" class="logs-tab-btn" data-tab="imageLogs">Log Gambar</button>
+    </div>
+
+    <div id="webLogs" class="logs-pane active">
+        <div class="logs-toolbar">
+            <p class="logs-description">
+
+            </p>
+
+            <select id="webSourceFilter" class="logs-select">
+                <option value="all">Semua Source</option>
+            </select>
+        </div>
+
+        <div id="webLogsContainer" class="activity-list">
+            <div class="empty-box">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Memuat log aktivitas web...</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="sensorLogs" class="logs-pane">
+        <div class="logs-toolbar">
+            <p class="logs-description">
+
+            </p>
+
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <select id="sensorNodeFilter" class="logs-select">
+                    <option value="all">Semua Node</option>
+                </select>
+
+                <select id="sensorStatusFilter" class="logs-select">
+                    <option value="all">Semua Status</option>
+                    <option value="AMAN">Aman</option>
+                    <option value="SIAGA">Siaga</option>
+                    <option value="WASPADA">Waspada</option>
+                    <option value="DARURAT">Darurat</option>
+                </select>
             </div>
         </div>
 
-        <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab(event, 'webLogs')">Log Aktivitas Web</button>
-            <button class="tab-btn" onclick="switchTab(event, 'sensorLogs')">Log Sensor</button>
-            <button class="tab-btn" onclick="switchTab(event, 'imageLogs')">Log Gambar</button>
-        </div>
-
-        <div id="webLogs" class="tab-pane active" style="display: flex; flex-direction: column; gap: 12px;">
-            <div style="display: flex; justify-content: flex-end;">
-                <button
-                    class="btn-primary"
-                    onclick="clearWebLogs()"
-                    style="width: auto; padding: 6px 12px; background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; font-size: 13px;">
-                    <i class="fas fa-trash"></i> Bersihkan Log Web
-                </button>
-            </div>
-
-            <div id="webLogsContent" style="display: flex; flex-direction: column; gap: 12px;">
-                <div style="text-align: center; padding: 24px; color: var(--text-secondary);">
-                    <p>Aktivitas log web masih kosong.</p>
-                </div>
+        <div id="sensorLogsContainer">
+            <div class="empty-box">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Memuat log sensor...</p>
             </div>
         </div>
+    </div>
 
-        <div id="sensorLogs" class="tab-pane" style="display: none; flex-direction: column; gap: 12px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                <div style="display: flex; gap: 8px;">
-                    <select
-                        id="filterNode"
-                        class="form-control"
-                        style="padding: 6px 12px; font-size: 13px; border-radius: 6px; width: auto;"
-                        onchange="if(window.renderSensorTable) window.renderSensorTable()">
-                        <option value="all">Semua Node</option>
-                        <option value="hulu">Node Hulu</option>
-                        <option value="hilir">Node Hilir</option>
-                    </select>
+    <div id="imageLogs" class="logs-pane">
+        <div class="logs-toolbar">
+            <p class="logs-description">
+                Riwayat tangkapan gambar dari sensor kamera node.
+            </p>
 
-                    <select
-                        id="filterStatus"
-                        class="form-control"
-                        style="padding: 6px 12px; font-size: 13px; border-radius: 6px; width: auto;"
-                        onchange="if(window.renderSensorTable) window.renderSensorTable()">
-                        <option value="all">Semua Status</option>
-                        <option value="AMAN">Aman</option>
-                        <option value="SIAGA">Siaga</option>
-                        <option value="WASPADA">Waspada</option>
-                    </select>
-                </div>
-
-                <button
-                    class="btn-primary"
-                    id="clearSensorLogsBtn"
-                    style="width: auto; padding: 6px 12px; background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; font-size: 13px;">
-                    <i class="fas fa-trash"></i> Bersihkan Semua
-                </button>
-            </div>
-
-            <div
-                id="sensorLogsContent"
-                style="display: flex; flex-direction: column; gap: 12px; min-height: 200px; justify-content: center; align-items: center; color: var(--text-secondary);">
-                <i class="fas fa-spinner fa-spin fa-2x" style="margin-bottom: 12px;"></i>
-                <p>Memuat tabel data sensor...</p>
-            </div>
+            <select id="imageNodeFilter" class="logs-select">
+                <option value="all">Semua Node</option>
+            </select>
         </div>
 
-        <div id="imageLogs" class="tab-pane" style="display: none; flex-direction: column; gap: 12px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                <p style="color: var(--text-secondary); font-size: 14px;">
-                    Riwayat tangkapan gambar dari sensor kamera node.
-                </p>
+        <div id="imageLogsContainer" class="image-grid">
+            <div class="empty-box" style="grid-column: 1 / -1;">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Memuat log gambar...</p>
             </div>
-
-            <div id="imageLogsContent" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;">
-                <div style="grid-column: 1 / -1; text-align: center; padding: 48px; color: var(--text-secondary);">
-                    <i class="fas fa-spinner fa-spin fa-2x" style="margin-bottom: 12px;"></i>
-                    <p>Memuat log gambar dari webcam...</p>
-                </div>
-            </div>
-        </div>
-
-        <div id="emptyLogState" style="display: none; text-align: center; padding: 48px; color: var(--text-secondary);">
-            <i class="far fa-folder-open" style="font-size: 48px; margin-bottom: 16px; color: #cbd5e1;"></i>
-            <p>Aktivitas log kosong. Belum ada rekaman sistem baru.</p>
         </div>
     </div>
 </div>
 
 <script>
-    window.allSensorLogs = [];
-    window.currentPage = 1;
+    window.activeLogTab = "webLogs";
 
-    function switchTab(event, tabId) {
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        document.querySelectorAll('.tab-pane').forEach(pane => {
-            pane.classList.remove('active');
-            pane.style.display = 'none';
-        });
+    document.querySelectorAll(".logs-tab-btn").forEach((button) => {
+        button.addEventListener("click", function() {
+            const targetTab = this.dataset.tab;
 
-        event.target.classList.add('active');
+            window.activeLogTab = targetTab;
 
-        const targetPane = document.getElementById(tabId);
-        if (targetPane) {
-            targetPane.classList.add('active');
-            targetPane.style.display = 'flex';
-        }
-    }
+            document.querySelectorAll(".logs-tab-btn").forEach((btn) => {
+                btn.classList.remove("active");
+            });
 
-    function clearWebLogs() {
-        if (confirm("Apakah Anda yakin ingin menghapus log aktivitas web?")) {
-            const webLogsContent = document.getElementById('webLogsContent');
+            document.querySelectorAll(".logs-pane").forEach((pane) => {
+                pane.classList.remove("active");
+            });
 
-            if (webLogsContent) {
-                webLogsContent.innerHTML = `
-                    <div style="text-align: center; padding: 24px; color: var(--text-secondary);">
-                        <p>Aktivitas log web telah dibersihkan.</p>
-                    </div>
-                `;
+            this.classList.add("active");
+
+            const pane = document.getElementById(targetTab);
+            if (pane) {
+                pane.classList.add("active");
             }
-
-            showToast('Log aktivitas web berhasil dibersihkan.', 'success');
-        }
-    }
+        });
+    });
 
     function escapeHtml(value) {
-        return String(value ?? '')
-            .replaceAll('&', '&amp;')
-            .replaceAll('<', '&lt;')
-            .replaceAll('>', '&gt;')
-            .replaceAll('"', '&quot;')
-            .replaceAll("'", '&#039;');
+        return String(value ?? "")
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
     }
 
     function safeCsv(value) {
-        const text = String(value ?? '').replaceAll('"', '""');
+        const text = String(value ?? "").replaceAll('"', '""');
 
         if (/^[=+\-@]/.test(text)) {
             return `"'${text}"`;
         }
 
         return `"${text}"`;
-    }
-
-    function exportToCSV() {
-        if (!window.allSensorLogs || window.allSensorLogs.length === 0) {
-            showToast('Tidak ada data sensor untuk diekspor!', 'danger');
-            return;
-        }
-
-        let csvContent = "\uFEFF";
-        csvContent += "ID;Waktu;Node;Ketinggian Air (cm);Arus Air (L/min);Curah Hujan (mm/jam);Kecepatan Angin (km/jam);Status\n";
-
-        window.allSensorLogs.forEach(row => {
-            csvContent += [
-                safeCsv(row.id),
-                safeCsv(row.waktu),
-                safeCsv(row.node),
-                safeCsv(row.ketinggian_air),
-                safeCsv(row.arus_air),
-                safeCsv(row.curah_hujan),
-                safeCsv(row.kecepatan_angin),
-                safeCsv(row.status)
-            ].join(';') + "\n";
-        });
-
-        const blob = new Blob([csvContent], {
-            type: 'text/csv;charset=utf-8;'
-        });
-
-        const link = document.createElement("a");
-        const url = URL.createObjectURL(blob);
-
-        link.setAttribute("href", url);
-        link.setAttribute("download", "log_sensor_deluvion_" + new Date().getTime() + ".csv");
-        link.style.visibility = 'hidden';
-
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-
-        URL.revokeObjectURL(url);
-
-        showToast('Berhasil mengunduh format CSV.', 'success');
     }
 </script>
 
@@ -215,8 +405,6 @@
     import {
         getFirestore,
         collection,
-        query,
-        orderBy,
         onSnapshot
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
@@ -234,360 +422,625 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    const sensorLogsContainer = document.getElementById('sensorLogsContent');
-    const imageLogsContainer = document.getElementById('imageLogsContent');
-    const clearSensorLogsBtn = document.getElementById('clearSensorLogsBtn');
+    const webLogsContainer = document.getElementById("webLogsContainer");
+    const sensorLogsContainer = document.getElementById("sensorLogsContainer");
+    const imageLogsContainer = document.getElementById("imageLogsContainer");
 
-    const rowsPerPage = 50;
-    let unsubscribeSensorLogs = null;
+    const webSourceFilter = document.getElementById("webSourceFilter");
+    const sensorNodeFilter = document.getElementById("sensorNodeFilter");
+    const sensorStatusFilter = document.getElementById("sensorStatusFilter");
+    const imageNodeFilter = document.getElementById("imageNodeFilter");
 
-    function getCsrfToken() {
-        const token = document.querySelector('meta[name="csrf-token"]');
-        return token ? token.getAttribute('content') : '';
+    let webLogs = [];
+    let sensorLogs = [];
+    let nodeOptions = new Map();
+    let sourceOptions = new Set();
+
+    function parseTime(value) {
+        if (!value) return 0;
+
+        if (typeof value === "object" && typeof value.toDate === "function") {
+            return value.toDate().getTime();
+        }
+
+        if (typeof value === "object" && typeof value.seconds === "number") {
+            return value.seconds * 1000;
+        }
+
+        const dateText = String(value).replace(" ", "T");
+        const parsed = new Date(dateText).getTime();
+
+        return Number.isFinite(parsed) ? parsed : 0;
     }
 
-    function formatTimestamp(value) {
-        try {
-            if (value && typeof value.toDate === 'function') {
-                const dateObj = value.toDate();
-                return dateObj.toLocaleString('id-ID', {
-                    dateStyle: 'medium',
-                    timeStyle: 'short'
-                });
+    function formatTime(value) {
+        if (!value) return "-";
+
+        let dateObject = null;
+
+        if (typeof value === "object" && typeof value.toDate === "function") {
+            dateObject = value.toDate();
+        } else if (typeof value === "object" && typeof value.seconds === "number") {
+            dateObject = new Date(value.seconds * 1000);
+        } else {
+            const parsed = new Date(String(value).replace(" ", "T"));
+
+            if (!Number.isNaN(parsed.getTime())) {
+                dateObject = parsed;
             }
-
-            if (typeof value === 'string') {
-                const dateObj = new Date(value.replace(' ', 'T'));
-
-                if (!Number.isNaN(dateObj.getTime())) {
-                    return dateObj.toLocaleString('id-ID', {
-                        dateStyle: 'medium',
-                        timeStyle: 'short'
-                    });
-                }
-
-                return value;
-            }
-
-            return '-';
-        } catch (error) {
-            return '-';
         }
+
+        if (!dateObject) return String(value);
+
+        return dateObject.toLocaleString("id-ID", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit"
+        });
     }
 
-    function getStatusByWaterLevel(value) {
-        const level = Number(value);
-
-        if (Number.isNaN(level)) {
-            return 'AMAN';
+    function normalizeText(value, fallback = "-") {
+        if (value === undefined || value === null || value === "") {
+            return fallback;
         }
 
-        if (level > 150) {
-            return 'WASPADA';
+        return String(value);
+    }
+
+    function normalizeNodeId(value) {
+        if (value === undefined || value === null || value === "") {
+            return "unknown";
         }
 
-        if (level > 100) {
-            return 'SIAGA';
-        }
+        return String(value).trim();
+    }
 
-        return 'AMAN';
+    function normalizeStatus(value) {
+        const status = String(value ?? "").trim().toUpperCase();
+
+        if (status === "AMAN") return "AMAN";
+        if (status === "SIAGA") return "SIAGA";
+        if (status === "WASPADA") return "WASPADA";
+        if (status === "DARURAT") return "DARURAT";
+
+        return status || "AMAN";
+    }
+
+    function statusFromWaterLevel(level) {
+        const value = Number(level);
+
+        if (!Number.isFinite(value)) return "AMAN";
+        if (value > 150) return "WASPADA";
+        if (value > 100) return "SIAGA";
+
+        return "AMAN";
     }
 
     function getStatusStyle(status) {
-        if (status === 'AMAN') {
+        const value = normalizeStatus(status);
+
+        if (value === "AMAN") {
             return {
-                bg: '#dcfce7',
-                color: '#166534',
-                rowBg: '#ffffff',
-                icon: '<i class="fas fa-check-circle"></i>'
+                bg: "#dcfce7",
+                color: "#166534",
+                icon: "fa-check-circle"
             };
         }
 
-        if (status === 'SIAGA') {
+        if (value === "SIAGA") {
             return {
-                bg: '#fef08a',
-                color: '#854d0e',
-                rowBg: '#fffbeb',
-                icon: '<i class="fas fa-exclamation-circle"></i>'
+                bg: "#fef9c3",
+                color: "#854d0e",
+                icon: "fa-exclamation-circle"
+            };
+        }
+
+        if (value === "WASPADA") {
+            return {
+                bg: "#ffedd5",
+                color: "#9a3412",
+                icon: "fa-triangle-exclamation"
             };
         }
 
         return {
-            bg: '#fee2e2',
-            color: '#991b1b',
-            rowBg: '#fff1f2',
-            icon: '<i class="fas fa-exclamation-triangle"></i>'
+            bg: "#fee2e2",
+            color: "#991b1b",
+            icon: "fa-triangle-exclamation"
         };
     }
 
-    window.renderSensorTable = function() {
-        const filterNode = document.getElementById('filterNode') ?
-            document.getElementById('filterNode').value :
-            'all';
+    function getNodeLabel(data) {
+        const nodeId = normalizeNodeId(data.node_id);
+        const nodeName = String(data.node_name ?? "").trim();
+        const penempatan = String(data.penempatan ?? "").trim().toLowerCase();
+        const situs = String(data.situs ?? data.area ?? "").trim().toUpperCase();
 
-        const filterStatus = document.getElementById('filterStatus') ?
-            document.getElementById('filterStatus').value :
-            'all';
+        if (nodeName) return nodeName;
 
-        let filteredLogs = window.allSensorLogs || [];
+        let label = `Node ${nodeId}`;
 
-        if (filterNode !== 'all') {
-            filteredLogs = filteredLogs.filter(log => log.nodeCode === filterNode);
+        if (penempatan) {
+            label += ` - ${penempatan.charAt(0).toUpperCase()}${penempatan.slice(1)}`;
         }
 
-        if (filterStatus !== 'all') {
-            filteredLogs = filteredLogs.filter(log => log.status === filterStatus);
+        if (situs) {
+            label += ` (${situs})`;
         }
 
-        if (!sensorLogsContainer) {
-            return;
+        return label;
+    }
+
+    function registerNode(data) {
+        const nodeId = normalizeNodeId(data.node_id);
+
+        if (nodeId === "unknown") return;
+
+        if (!nodeOptions.has(nodeId)) {
+            nodeOptions.set(nodeId, {
+                id: nodeId,
+                label: getNodeLabel(data)
+            });
+        }
+    }
+
+    function refreshNodeDropdowns() {
+        const currentSensor = sensorNodeFilter ? sensorNodeFilter.value : "all";
+        const currentImage = imageNodeFilter ? imageNodeFilter.value : "all";
+
+        const nodes = Array.from(nodeOptions.values()).sort((a, b) => {
+            return a.label.localeCompare(b.label, "id");
+        });
+
+        [sensorNodeFilter, imageNodeFilter].forEach((select) => {
+            if (!select) return;
+
+            select.innerHTML = `<option value="all">Semua Node</option>`;
+
+            nodes.forEach((node) => {
+                const option = document.createElement("option");
+                option.value = node.id;
+                option.textContent = node.label;
+                select.appendChild(option);
+            });
+        });
+
+        if (sensorNodeFilter && Array.from(sensorNodeFilter.options).some(opt => opt.value === currentSensor)) {
+            sensorNodeFilter.value = currentSensor;
         }
 
-        if (filteredLogs.length === 0) {
-            sensorLogsContainer.innerHTML = `
-                <div style="text-align: center; padding: 24px; color: var(--text-secondary);">
-                    <i class="fas fa-filter" style="font-size: 24px; margin-bottom: 8px;"></i>
-                    <p>Tidak ada data yang sesuai dengan filter pencarian.</p>
+        if (imageNodeFilter && Array.from(imageNodeFilter.options).some(opt => opt.value === currentImage)) {
+            imageNodeFilter.value = currentImage;
+        }
+    }
+
+    function refreshSourceDropdown() {
+        if (!webSourceFilter) return;
+
+        const currentSource = webSourceFilter.value || "all";
+
+        webSourceFilter.innerHTML = `<option value="all">Semua Source</option>`;
+
+        Array.from(sourceOptions)
+            .sort((a, b) => a.localeCompare(b, "id"))
+            .forEach((source) => {
+                const option = document.createElement("option");
+                option.value = source;
+                option.textContent = source;
+                webSourceFilter.appendChild(option);
+            });
+
+        if (Array.from(webSourceFilter.options).some(opt => opt.value === currentSource)) {
+            webSourceFilter.value = currentSource;
+        }
+    }
+
+    function buildSensorLog(docSnap) {
+        const data = docSnap.data();
+        registerNode(data);
+
+        const status = normalizeStatus(
+            data.water_status || data.status || statusFromWaterLevel(data.water_level)
+        );
+
+        return {
+            id: docSnap.id,
+            timeRaw: data.time || data.created_at,
+            timeMs: parseTime(data.time || data.created_at),
+            waktu: formatTime(data.time || data.created_at),
+            node_id: normalizeNodeId(data.node_id),
+            node: getNodeLabel(data),
+            penempatan: normalizeText(data.penempatan),
+            situs: normalizeText(data.situs || data.area),
+            water_level: data.water_level ?? "-",
+            water_flow: data.water_flow ?? "-",
+            ombrometer: data.ombrometer ?? "-",
+            anemometer: data.anemometer ?? "-",
+            water_status: status,
+            image_url: data.espcam_img_url || data.image_url || ""
+        };
+    }
+
+    function buildWebLog(docSnap) {
+        const data = docSnap.data();
+
+        const source = normalizeText(data.source, "web_admin");
+        sourceOptions.add(source);
+
+        let details = data.details ?? "-";
+
+        if (typeof details === "object") {
+            try {
+                details = JSON.stringify(details);
+            } catch (error) {
+                details = String(details);
+            }
+        }
+
+        return {
+            id: docSnap.id,
+            action: normalizeText(data.action),
+            admin_email: normalizeText(data.admin_email),
+            created_at: data.created_at,
+            timeMs: parseTime(data.created_at),
+            waktu: formatTime(data.created_at),
+            details: normalizeText(details),
+            ip_address: normalizeText(data.ip_address),
+            source: source,
+            user_agent: normalizeText(data.user_agent)
+        };
+    }
+
+    function renderWebLogs() {
+        if (!webLogsContainer) return;
+
+        const selectedSource = webSourceFilter ? webSourceFilter.value : "all";
+
+        let rows = webLogs;
+
+        if (selectedSource !== "all") {
+            rows = rows.filter(row => row.source === selectedSource);
+        }
+
+        if (rows.length === 0) {
+            webLogsContainer.innerHTML = `
+                <div class="empty-box">
+                    <i class="far fa-folder-open" style="font-size: 34px; margin-bottom: 12px;"></i>
+                    <p>Aktivitas log web masih kosong.</p>
                 </div>
             `;
             return;
         }
 
-        const totalPages = Math.ceil(filteredLogs.length / rowsPerPage);
+        let html = "";
 
-        if (window.currentPage > totalPages) {
-            window.currentPage = totalPages;
+        rows.slice(0, 100).forEach((row) => {
+            html += `
+                <div class="activity-card">
+                    <div class="activity-icon">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+
+                    <div>
+                        <div class="activity-title">${escapeHtml(row.action)}</div>
+
+                        <div class="activity-meta">
+                            <span><i class="far fa-clock"></i> ${escapeHtml(row.waktu)}</span>
+                            <span><i class="far fa-user"></i> ${escapeHtml(row.admin_email)}</span>
+                            <span><i class="fas fa-globe"></i> ${escapeHtml(row.source)}</span>
+                            <span><i class="fas fa-network-wired"></i> ${escapeHtml(row.ip_address)}</span>
+                        </div>
+
+                        <div class="activity-detail">
+                            ${escapeHtml(row.details)}
+                        </div>
+
+                        <div style="font-size: 11px; color: #64748b; margin-top: 8px; word-break: break-word;">
+                            ${escapeHtml(row.user_agent)}
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+
+        webLogsContainer.innerHTML = html;
+    }
+
+    function renderSensorLogs() {
+        if (!sensorLogsContainer) return;
+
+        const selectedNode = sensorNodeFilter ? sensorNodeFilter.value : "all";
+        const selectedStatus = sensorStatusFilter ? sensorStatusFilter.value : "all";
+
+        let rows = sensorLogs;
+
+        if (selectedNode !== "all") {
+            rows = rows.filter(row => row.node_id === selectedNode);
         }
 
-        if (window.currentPage < 1) {
-            window.currentPage = 1;
+        if (selectedStatus !== "all") {
+            rows = rows.filter(row => row.water_status === selectedStatus);
         }
 
-        const startIndex = (window.currentPage - 1) * rowsPerPage;
-        const endIndex = startIndex + rowsPerPage;
-        const paginatedLogs = filteredLogs.slice(startIndex, endIndex);
+        if (rows.length === 0) {
+            sensorLogsContainer.innerHTML = `
+                <div class="empty-box">
+                    <i class="fas fa-filter" style="font-size: 28px; margin-bottom: 12px;"></i>
+                    <p>Tidak ada log sensor sesuai filter.</p>
+                </div>
+            `;
+            return;
+        }
 
-        let htmlContent = `
-            <div style="overflow-x: auto; border-radius: 8px; border: 1px solid #e2e8f0; width: 100%;">
-                <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;">
+        let html = `
+            <div class="logs-table-wrapper">
+                <table class="logs-table">
                     <thead>
-                        <tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0;">
-                            <th style="padding: 12px 16px; font-weight: 600; color: #475569;">Waktu</th>
-                            <th style="padding: 12px 16px; font-weight: 600; color: #475569;">Node</th>
-                            <th style="padding: 12px 16px; font-weight: 600; color: #475569;">Air (cm)</th>
-                            <th style="padding: 12px 16px; font-weight: 600; color: #475569;">Arus (L/min)</th>
-                            <th style="padding: 12px 16px; font-weight: 600; color: #475569;">Hujan (mm/j)</th>
-                            <th style="padding: 12px 16px; font-weight: 600; color: #475569;">Angin (km/j)</th>
-                            <th style="padding: 12px 16px; font-weight: 600; color: #475569;">Status</th>
+                        <tr>
+                            <th>Waktu</th>
+                            <th>Node</th>
+                            <th>Penempatan</th>
+                            <th>Ketinggian</th>
+                            <th>Arus</th>
+                            <th>Curah Hujan</th>
+                            <th>Angin</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
         `;
 
-        paginatedLogs.forEach((log) => {
-            const statusStyle = getStatusStyle(log.status);
+        rows.slice(0, 100).forEach((row) => {
+            const style = getStatusStyle(row.water_status);
 
-            htmlContent += `
-                <tr style="border-bottom: 1px solid #e2e8f0; background: ${statusStyle.rowBg}; transition: background 0.2s;">
-                    <td style="padding: 12px 16px; white-space: nowrap;">${escapeHtml(log.dateStr)}</td>
-                    <td style="padding: 12px 16px; font-weight: 500;">${escapeHtml(log.node)}</td>
-                    <td style="padding: 12px 16px;">${escapeHtml(log.ketinggian_air)}</td>
-                    <td style="padding: 12px 16px;">${escapeHtml(log.arus_air)}</td>
-                    <td style="padding: 12px 16px;">${escapeHtml(log.curah_hujan)}</td>
-                    <td style="padding: 12px 16px;">${escapeHtml(log.kecepatan_angin)}</td>
-                    <td style="padding: 12px 16px;">
-                        <span style="display: inline-flex; align-items: center; gap: 6px; background: ${statusStyle.bg}; color: ${statusStyle.color}; padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 600;">
-                            ${statusStyle.icon}
-                            ${escapeHtml(log.status)}
+            html += `
+                <tr>
+                    <td>${escapeHtml(row.waktu)}</td>
+                    <td><strong>${escapeHtml(row.node)}</strong></td>
+                    <td style="text-transform: capitalize;">${escapeHtml(row.penempatan)}</td>
+                    <td>${escapeHtml(row.water_level)} cm</td>
+                    <td>${escapeHtml(row.water_flow)} L/min</td>
+                    <td>${escapeHtml(row.ombrometer)} mm/j</td>
+                    <td>${escapeHtml(row.anemometer)} km/j</td>
+                    <td>
+                        <span class="status-badge" style="background: ${style.bg}; color: ${style.color};">
+                            <i class="fas ${style.icon}"></i>
+                            ${escapeHtml(row.water_status)}
                         </span>
                     </td>
                 </tr>
             `;
         });
 
-        htmlContent += `
+        html += `
                     </tbody>
                 </table>
             </div>
         `;
 
-        htmlContent += `
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px;">
-                <button
-                    class="btn-primary"
-                    style="width: auto; padding: 6px 12px; font-size: 13px;"
-                    ${window.currentPage <= 1 ? 'disabled' : ''}
-                    onclick="window.currentPage--; window.renderSensorTable();">
-                    Sebelumnya
-                </button>
+        sensorLogsContainer.innerHTML = html;
+    }
 
-                <span style="font-size: 13px; color: var(--text-secondary);">
-                    Halaman ${window.currentPage} dari ${totalPages}
-                </span>
+    function renderImageLogs() {
+        if (!imageLogsContainer) return;
 
-                <button
-                    class="btn-primary"
-                    style="width: auto; padding: 6px 12px; font-size: 13px;"
-                    ${window.currentPage >= totalPages ? 'disabled' : ''}
-                    onclick="window.currentPage++; window.renderSensorTable();">
-                    Berikutnya
-                </button>
-            </div>
-        `;
+        const selectedNode = imageNodeFilter ? imageNodeFilter.value : "all";
 
-        sensorLogsContainer.innerHTML = htmlContent;
-    };
+        let rows = sensorLogs.filter(row => row.image_url);
 
-    function renderImageLogsFromSensorData(logs) {
-        if (!imageLogsContainer) {
-            return;
+        if (selectedNode !== "all") {
+            rows = rows.filter(row => row.node_id === selectedNode);
         }
 
-        const imageLogs = logs.filter(log => log.imageUrl);
-
-        if (imageLogs.length === 0) {
+        if (rows.length === 0) {
             imageLogsContainer.innerHTML = `
-                <div style="grid-column: 1 / -1; text-align: center; padding: 48px; color: var(--text-secondary);">
-                    <i class="far fa-images" style="font-size: 36px; margin-bottom: 12px;"></i>
-                    <p>Belum ada log gambar yang tersedia.</p>
+                <div class="empty-box" style="grid-column: 1 / -1;">
+                    <i class="far fa-images" style="font-size: 34px; margin-bottom: 12px;"></i>
+                    <p>Belum ada log gambar untuk filter ini.</p>
                 </div>
             `;
             return;
         }
 
-        let htmlContent = '';
+        let html = "";
 
-        imageLogs.slice(0, 30).forEach(log => {
-            htmlContent += `
-                <div class="interactive-card" style="border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; background: #fff;">
-                    <img
-                        src="${escapeHtml(log.imageUrl)}"
-                        alt="Gambar sensor ${escapeHtml(log.node)}"
-                        style="width: 100%; height: 180px; object-fit: cover;"
-                        onerror="this.style.display='none';">
+        rows.slice(0, 80).forEach((row) => {
+            html += `
+                <div class="image-card">
+                    <img src="${escapeHtml(row.image_url)}" alt="${escapeHtml(row.node)}" loading="lazy">
 
-                    <div style="padding: 12px;">
-                        <div style="font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">
-                            ${escapeHtml(log.node)}
+                    <div class="image-card-body">
+                        <div class="image-title">${escapeHtml(row.node)}</div>
+                        <div class="image-meta" style="text-transform: capitalize;">
+                            ${escapeHtml(row.penempatan)}
                         </div>
-
-                        <div style="font-size: 12px; color: var(--text-secondary);">
-                            ${escapeHtml(log.dateStr)}
+                        <div class="image-meta">
+                            ${escapeHtml(row.waktu)}
                         </div>
                     </div>
                 </div>
             `;
         });
 
-        imageLogsContainer.innerHTML = htmlContent;
+        imageLogsContainer.innerHTML = html;
     }
 
-    function buildLogObject(docSnap) {
-        const data = docSnap.data();
-
-        const nodeCode = data.penempatan === 'hulu' ? 'hulu' : 'hilir';
-        const nodeName = nodeCode === 'hulu' ? 'Node Hulu' : 'Node Hilir';
-        const status = data.status || getStatusByWaterLevel(data.water_level);
-        const dateStr = formatTimestamp(data.time);
-
-        return {
-            id: docSnap.id,
-            waktu: dateStr,
-            dateStr: dateStr,
-            node: nodeName,
-            nodeCode: nodeCode,
-            ketinggian_air: data.water_level ?? '-',
-            arus_air: data.water_flow ?? '-',
-            curah_hujan: data.ombrometer ?? '-',
-            kecepatan_angin: data.anemometer ?? '-',
-            status: status,
-            imageUrl: data.espcam_img_url || data.image_url || ''
-        };
+    function renderAll() {
+        refreshNodeDropdowns();
+        refreshSourceDropdown();
+        renderWebLogs();
+        renderSensorLogs();
+        renderImageLogs();
     }
 
-    function startSensorLogListener() {
-        if (!sensorLogsContainer) {
-            return;
-        }
+    function listenLogData() {
+        const logDataRef = collection(db, "monitoring", "depok", "log_data");
 
-        const logDataRef = collection(db, 'monitoring', 'depok', 'log_data');
-        const q = query(logDataRef, orderBy('time', 'desc'));
+        onSnapshot(logDataRef, (snapshot) => {
+            const rows = [];
 
-        unsubscribeSensorLogs = onSnapshot(q, (snapshot) => {
-            if (snapshot.empty) {
-                window.allSensorLogs = [];
-
-                sensorLogsContainer.innerHTML = `
-                    <div style="text-align: center; padding: 24px; color: var(--text-secondary);">
-                        <p>Belum ada data log sensor.</p>
-                    </div>
-                `;
-
-                renderImageLogsFromSensorData([]);
-                return;
-            }
-
-            const logs = [];
+            nodeOptions = new Map();
 
             snapshot.forEach((docSnap) => {
-                logs.push(buildLogObject(docSnap));
+                rows.push(buildSensorLog(docSnap));
             });
 
-            window.allSensorLogs = logs;
-            window.currentPage = 1;
+            rows.sort((a, b) => b.timeMs - a.timeMs);
 
-            window.renderSensorTable();
-            renderImageLogsFromSensorData(logs);
+            sensorLogs = rows;
+
+            renderAll();
         }, (error) => {
-            console.error("Firestore log listener error:", error);
+            console.error("Gagal membaca log_data:", error);
 
             sensorLogsContainer.innerHTML = `
-                <div style="text-align: center; padding: 24px; color: #b91c1c;">
-                    <p>Gagal memuat log sensor.</p>
+                <div class="empty-box" style="color: #b91c1c;">
+                    <p>Gagal membaca log_data dari Firestore.</p>
+                    <p>Cek console browser.</p>
                 </div>
             `;
         });
     }
 
-    if (clearSensorLogsBtn) {
-        clearSensorLogsBtn.addEventListener('click', async () => {
-            const confirmDelete = confirm(
-                "Apakah Anda yakin ingin menghapus semua log sensor? Aksi ini hanya boleh dilakukan oleh admin."
-            );
+    function listenAdminAuditLogs() {
+        const auditRef = collection(db, "monitoring", "depok", "admin_audit_logs");
 
-            if (!confirmDelete) {
-                return;
-            }
+        onSnapshot(auditRef, (snapshot) => {
+            const rows = [];
 
-            clearSensorLogsBtn.disabled = true;
-            clearSensorLogsBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menghapus...';
+            sourceOptions = new Set();
 
-            try {
-                const response = await fetch("{{ route('logs.clear') }}", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRF-TOKEN": getCsrfToken(),
-                        "Accept": "application/json"
-                    },
-                    body: JSON.stringify({})
-                });
+            snapshot.forEach((docSnap) => {
+                rows.push(buildWebLog(docSnap));
+            });
 
-                const result = await response.json();
+            rows.sort((a, b) => b.timeMs - a.timeMs);
 
-                if (!response.ok || !result.success) {
-                    throw new Error(result.error || "Gagal menghapus log sensor.");
-                }
+            webLogs = rows;
 
-                showToast(`Berhasil menghapus ${result.deleted} log sensor.`, 'success');
-            } catch (error) {
-                console.error("Clear logs error:", error);
-                showToast("Gagal menghapus log sensor.", 'danger');
-            } finally {
-                clearSensorLogsBtn.disabled = false;
-                clearSensorLogsBtn.innerHTML = '<i class="fas fa-trash"></i> Bersihkan Semua';
-            }
+            renderAll();
+        }, (error) => {
+            console.error("Gagal membaca admin_audit_logs:", error);
+
+            webLogsContainer.innerHTML = `
+                <div class="empty-box" style="color: #b91c1c;">
+                    <p>Gagal membaca admin_audit_logs dari Firestore.</p>
+                    <p>Cek console browser.</p>
+                </div>
+            `;
         });
+    }
+
+    if (webSourceFilter) {
+        webSourceFilter.addEventListener("change", renderWebLogs);
+    }
+
+    if (sensorNodeFilter) {
+        sensorNodeFilter.addEventListener("change", renderSensorLogs);
+    }
+
+    if (sensorStatusFilter) {
+        sensorStatusFilter.addEventListener("change", renderSensorLogs);
+    }
+
+    if (imageNodeFilter) {
+        imageNodeFilter.addEventListener("change", renderImageLogs);
+    }
+
+    window.exportCurrentLogCSV = function() {
+        let rows = [];
+        let filename = "log_deluvion.csv";
+        let header = "";
+
+        if (window.activeLogTab === "webLogs") {
+            rows = webLogs;
+            filename = `log_aktivitas_web_${Date.now()}.csv`;
+            header = "Waktu;Action;Admin Email;Source;IP Address;Details;User Agent\n";
+
+            let csv = "\uFEFF" + header;
+
+            rows.forEach((row) => {
+                csv += [
+                    safeCsv(row.waktu),
+                    safeCsv(row.action),
+                    safeCsv(row.admin_email),
+                    safeCsv(row.source),
+                    safeCsv(row.ip_address),
+                    safeCsv(row.details),
+                    safeCsv(row.user_agent)
+                ].join(";") + "\n";
+            });
+
+            downloadCSV(csv, filename);
+            return;
+        }
+
+        if (window.activeLogTab === "sensorLogs") {
+            rows = sensorLogs;
+            filename = `log_sensor_${Date.now()}.csv`;
+            header = "Waktu;Node;Node ID;Penempatan;Ketinggian;Arus;Curah Hujan;Angin;Status\n";
+
+            let csv = "\uFEFF" + header;
+
+            rows.forEach((row) => {
+                csv += [
+                    safeCsv(row.waktu),
+                    safeCsv(row.node),
+                    safeCsv(row.node_id),
+                    safeCsv(row.penempatan),
+                    safeCsv(row.water_level),
+                    safeCsv(row.water_flow),
+                    safeCsv(row.ombrometer),
+                    safeCsv(row.anemometer),
+                    safeCsv(row.water_status)
+                ].join(";") + "\n";
+            });
+
+            downloadCSV(csv, filename);
+            return;
+        }
+
+        if (window.activeLogTab === "imageLogs") {
+            rows = sensorLogs.filter(row => row.image_url);
+            filename = `log_gambar_${Date.now()}.csv`;
+            header = "Waktu;Node;Node ID;Penempatan;Image URL\n";
+
+            let csv = "\uFEFF" + header;
+
+            rows.forEach((row) => {
+                csv += [
+                    safeCsv(row.waktu),
+                    safeCsv(row.node),
+                    safeCsv(row.node_id),
+                    safeCsv(row.penempatan),
+                    safeCsv(row.image_url)
+                ].join(";") + "\n";
+            });
+
+            downloadCSV(csv, filename);
+        }
+    };
+
+    function downloadCSV(csv, filename) {
+        const blob = new Blob([csv], {
+            type: "text/csv;charset=utf-8;"
+        });
+
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+
+        link.href = url;
+        link.download = filename;
+        link.style.display = "none";
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        URL.revokeObjectURL(url);
     }
 
     onAuthStateChanged(auth, (user) => {
@@ -596,13 +1049,8 @@
             return;
         }
 
-        startSensorLogListener();
-    });
-
-    window.addEventListener('beforeunload', () => {
-        if (typeof unsubscribeSensorLogs === 'function') {
-            unsubscribeSensorLogs();
-        }
+        listenLogData();
+        listenAdminAuditLogs();
     });
 </script>
 @endsection

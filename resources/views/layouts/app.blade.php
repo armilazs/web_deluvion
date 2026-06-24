@@ -16,6 +16,161 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <style>
+        .mobile-menu-btn {
+            display: none;
+            width: 42px;
+            height: 42px;
+            border: none;
+            border-radius: 12px;
+            background: #eff6ff;
+            color: var(--primary-blue);
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .sidebar-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.55);
+            z-index: 998;
+        }
+
+        .sidebar-backdrop.active {
+            display: block;
+        }
+
+        .desktop-only {
+            display: inline-flex;
+        }
+
+        @media (max-width: 1024px) {
+            body {
+                overflow-x: hidden;
+            }
+
+            .mobile-menu-btn {
+                display: inline-flex;
+            }
+
+            .desktop-only {
+                display: none !important;
+            }
+
+            .sidebar {
+                position: fixed !important;
+                top: 0;
+                left: 0;
+                height: 100vh;
+                z-index: 999;
+                transform: translateX(-100%);
+                transition: transform 0.25s ease;
+                box-shadow: 12px 0 30px rgba(15, 23, 42, 0.18);
+            }
+
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+
+            .main-wrapper {
+                margin-left: 0 !important;
+                width: 100% !important;
+                min-height: 100vh;
+            }
+
+            .topbar {
+                height: auto !important;
+                min-height: 78px;
+                padding: 18px 18px 12px !important;
+                gap: 12px;
+                align-items: flex-start;
+            }
+
+            .greeting {
+                flex: 1;
+                min-width: 0;
+            }
+
+            .greeting p {
+                font-size: 12px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .greeting h1 {
+                font-size: 22px;
+                line-height: 1.2;
+            }
+
+            .topbar-right {
+                gap: 8px;
+            }
+
+            .notification-btn {
+                width: 42px;
+                height: 42px;
+                flex-shrink: 0;
+            }
+
+            .user-profile {
+                padding: 6px 8px;
+                min-width: auto;
+            }
+
+            .user-profile .user-info {
+                display: none;
+            }
+
+            .content-area {
+                padding: 16px !important;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr !important;
+            }
+
+            .widget-card,
+            .chart-container,
+            .logs-card {
+                border-radius: 14px !important;
+            }
+
+            table {
+                min-width: 720px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .topbar {
+                padding: 14px 14px 10px !important;
+            }
+
+            .greeting h1 {
+                font-size: 20px;
+            }
+
+            .content-area {
+                padding: 12px !important;
+            }
+
+            .avatar {
+                width: 36px;
+                height: 36px;
+                font-size: 14px;
+            }
+
+            .dropdown-menu {
+                right: 0;
+                min-width: 190px;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -41,8 +196,10 @@
     }
     @endphp
 
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
     <!-- Sidebar -->
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar">
         <div class="sidebar-logo">
             DL&middot;VN
         </div>
@@ -89,6 +246,10 @@
     <main class="main-wrapper">
         <!-- Topbar -->
         <header class="topbar" style="padding-top: 24px; height: 96px;">
+            <button type="button" class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Buka menu">
+                <i class="fas fa-bars"></i>
+            </button>
+
             <div class="greeting">
                 <p>Hello {{ e($adminName) }}, welcome back!</p>
                 <h1>@yield('title', 'Dashboard')</h1>
@@ -100,7 +261,7 @@
                     <div class="notification-dot"></div>
                 </div>
 
-                <div class="user-profile" onclick="toggleDropdown()">
+                <div class="user-profile" onclick="toggleDropdown(event)">
                     <div class="avatar">{{ e($initials) }}</div>
 
                     <div class="user-info">
@@ -108,7 +269,7 @@
                         <div class="role">Pengelola</div>
                     </div>
 
-                    <i class="fas fa-chevron-down" style="color: var(--text-secondary); font-size: 12px;"></i>
+                    <i class="fas fa-chevron-down desktop-only" style="color: var(--text-secondary); font-size: 12px;"></i>
 
                     <!-- Dropdown Menu -->
                     <div class="dropdown-menu" id="profileDropdown">
@@ -144,6 +305,65 @@
     <div id="toastContainer" class="toast-container"></div>
 
     <script>
+        const sidebar = document.getElementById("sidebar");
+        const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+        const sidebarBackdrop = document.getElementById("sidebarBackdrop");
+
+        function openSidebar() {
+            if (sidebar) {
+                sidebar.classList.add("mobile-open");
+            }
+
+            if (sidebarBackdrop) {
+                sidebarBackdrop.classList.add("active");
+            }
+
+            document.body.style.overflow = "hidden";
+        }
+
+        function closeSidebar() {
+            if (sidebar) {
+                sidebar.classList.remove("mobile-open");
+            }
+
+            if (sidebarBackdrop) {
+                sidebarBackdrop.classList.remove("active");
+            }
+
+            document.body.style.overflow = "";
+        }
+
+        if (mobileMenuBtn) {
+            mobileMenuBtn.addEventListener("click", function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                if (sidebar && sidebar.classList.contains("mobile-open")) {
+                    closeSidebar();
+                } else {
+                    openSidebar();
+                }
+            });
+        }
+
+        if (sidebarBackdrop) {
+            sidebarBackdrop.addEventListener("click", closeSidebar);
+        }
+
+        document.querySelectorAll(".sidebar .nav-item").forEach(function(item) {
+            item.addEventListener("click", function() {
+                if (window.innerWidth <= 1024) {
+                    closeSidebar();
+                }
+            });
+        });
+
+        window.addEventListener("resize", function() {
+            if (window.innerWidth > 1024) {
+                closeSidebar();
+            }
+        });
+
         // Global Toast Function
         function showToast(message, type = "success") {
             const container = document.getElementById("toastContainer");
@@ -191,7 +411,11 @@
             });
         }
 
-        function toggleDropdown() {
+        function toggleDropdown(event) {
+            if (event) {
+                event.stopPropagation();
+            }
+
             const dropdown = document.getElementById("profileDropdown");
 
             if (dropdown) {
@@ -212,6 +436,17 @@
                 }
             }
         };
+
+        document.addEventListener("keydown", function(event) {
+            if (event.key === "Escape") {
+                closeSidebar();
+
+                const dropdown = document.getElementById("profileDropdown");
+                if (dropdown) {
+                    dropdown.classList.remove("active");
+                }
+            }
+        });
     </script>
 </body>
 

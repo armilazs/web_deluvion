@@ -215,9 +215,9 @@
                     </span>
 
                     <div class="status-legend" style="margin: 0;">
-                        <span><span style="display:inline-block; width:10px; height:10px; background:#22c55e; border:1px solid #16a34a;"></span> Aman (&lt;100cm)</span>
-                        <span><span style="display:inline-block; width:10px; height:10px; background:#eab308; border:1px solid #ca8a04;"></span> Siaga (100-150cm)</span>
-                        <span><span style="display:inline-block; width:10px; height:10px; background:#ef4444; border:1px solid #dc2626;"></span> Waspada (&gt;150cm)</span>
+                        <span><span style="display:inline-block; width:10px; height:10px; background:#22c55e; border:1px solid #16a34a;"></span> Aman </span>
+                        <span><span style="display:inline-block; width:10px; height:10px; background:#eab308; border:1px solid #ca8a04;"></span> Siaga </span>
+                        <span><span style="display:inline-block; width:10px; height:10px; background:#ef4444; border:1px solid #dc2626;"></span> Waspada </span>
                     </div>
                 </div>
 
@@ -414,29 +414,75 @@
         return (now - logTime) <= timeoutMs;
     }
 
+    function normalizeWaterStatus(status) {
+        if (!status) {
+            return "NO DATA";
+        }
+
+        const value = String(status).trim().toLowerCase();
+
+        if (value === "aman") {
+            return "AMAN";
+        }
+
+        if (value === "siaga") {
+            return "SIAGA";
+        }
+
+        if (value === "waspada") {
+            return "WASPADA";
+        }
+
+        if (value === "darurat") {
+            return "DARURAT";
+        }
+
+        return String(status).trim().toUpperCase();
+    }
+
+    function getWaterStatusColor(status) {
+        const value = normalizeWaterStatus(status);
+
+        if (value === "AMAN") {
+            return "var(--success-color)";
+        }
+
+        if (value === "SIAGA") {
+            return "#eab308";
+        }
+
+        if (value === "WASPADA") {
+            return "#f97316";
+        }
+
+        if (value === "DARURAT") {
+            return "var(--danger-color)";
+        }
+
+        return "#94a3b8";
+    }
+
     function updateStatusBadge(element, isOnline, logData, config) {
         if (!element) {
             return;
         }
 
-        if (!isOnline || !logData) {
-            element.innerText = !logData ? "NO DATA" : "OFFLINE";
+        if (!logData) {
+            element.innerText = "NO DATA";
             element.style.backgroundColor = "#94a3b8";
             return;
         }
 
-        const level = Number(logData.water_level ?? 0);
-
-        if (level >= Number(config.threshold_waspada ?? 150)) {
-            element.innerText = "WASPADA";
-            element.style.backgroundColor = "var(--danger-color)";
-        } else if (level >= Number(config.threshold_siaga ?? 100)) {
-            element.innerText = "SIAGA";
-            element.style.backgroundColor = "#eab308";
-        } else {
-            element.innerText = "AMAN";
-            element.style.backgroundColor = "var(--success-color)";
+        if (!isOnline) {
+            element.innerText = "OFFLINE";
+            element.style.backgroundColor = "#94a3b8";
+            return;
         }
+
+        const waterStatus = normalizeWaterStatus(logData.water_status);
+
+        element.innerText = waterStatus;
+        element.style.backgroundColor = getWaterStatusColor(waterStatus);
     }
 
     function updateOnlineBadge(elementId, isOnline) {
